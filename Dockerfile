@@ -1,5 +1,5 @@
 # Шаг 1: сборка React приложения
-FROM node:20-alpine AS builder
+FROM node:24 AS builder
 WORKDIR /app
 
 # Копируем зависимости отдельно — Docker кешируют этот слой
