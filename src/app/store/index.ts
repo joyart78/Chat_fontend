@@ -6,10 +6,12 @@ import {
   useSelector,
 } from "react-redux";
 import { baseApi } from "@/app/api/baseApi";
+import loginReducer from "@/entities/authLogin/model/slice/loginSlice.tsx";
 
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
+    token: loginReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

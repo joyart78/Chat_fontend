@@ -2,13 +2,14 @@ import type { RegistrationData, RegistrationErrors } from "./types";
 
 export const validateRegistration = (
   data: RegistrationData,
+  confirm: string,
 ): RegistrationErrors => {
   const errors: RegistrationErrors = {};
 
-  if (!data.username.trim()) {
-    errors.username = "Username is required";
-  } else if (data.username.length < 3) {
-    errors.username = "Username must be at least 3 characters";
+  if (!data.login.trim()) {
+    errors.login = "Username is required";
+  } else if (data.login.length < 3) {
+    errors.login = "Username must be at least 3 characters";
   }
 
   if (!data.password) {
@@ -17,9 +18,9 @@ export const validateRegistration = (
     errors.password = "Password must be at least 6 characters";
   }
 
-  if (!data.confirmPassword) {
+  if (!confirm) {
     errors.confirmPassword = "Please confirm your password";
-  } else if (data.password !== data.confirmPassword) {
+  } else if (data.password !== confirm) {
     errors.confirmPassword = "Passwords do not match";
   }
 
