@@ -7,21 +7,20 @@ import {
   validateRegistration,
   isValidRegistration,
 } from "@/entities/authRegistration";
+import { useRegistrationMutation } from "@/entities/authRegistration/api/registrationApi";
 import styles from "./RegistrationForm.module.css";
 
-interface RegistrationFormProps {
-  onSubmit: (data: RegistrationData) => Promise<void>;
-}
-
-export const RegistrationForm = ({ onSubmit }: RegistrationFormProps) => {
+export const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationData>({
-    username: "",
+    login: "",
     password: "",
-    confirmPassword: "",
   });
-
+  const [confirm, setConfirm] = useState("");
   const [errors, setErrors] = useState<RegistrationErrors>({});
-  const [loading, setLoading] = useState(false);
+  const [registration, { isLoading }] = useRegistrationMutation();
+  const handleChangeConfirm = (e: FormEvent<HTMLInputElement>) => {
+    setConfirm(e.currentTarget.value);
+  };
 
   const handleChange =
     (field: keyof RegistrationData) => (e: FormEvent<HTMLInputElement>) => {
@@ -34,20 +33,19 @@ export const RegistrationForm = ({ onSubmit }: RegistrationFormProps) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const validationErrors = validateRegistration(formData);
+    const validationErrors = validateRegistration(formData, confirm);
 
     if (!isValidRegistration(validationErrors)) {
       setErrors(validationErrors);
       return;
     }
 
-    setLoading(true);
     try {
-      await onSubmit(formData);
+      console.log("registration", formData);
+      const result = await registration(formData).unwrap();
+      console.log("Registration success:", result);
     } catch (error) {
       console.error("Registration failed:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -58,9 +56,9 @@ export const RegistrationForm = ({ onSubmit }: RegistrationFormProps) => {
       <Input
         label="Username"
         type="text"
-        value={formData.username}
-        onChange={handleChange("username")}
-        error={errors.username}
+        value={formData.login}
+        onChange={handleChange("login")}
+        error={errors.login}
         placeholder="Enter your username"
       />
 
@@ -76,13 +74,13 @@ export const RegistrationForm = ({ onSubmit }: RegistrationFormProps) => {
       <Input
         label="Confirm Password"
         type="password"
-        value={formData.confirmPassword}
-        onChange={handleChange("confirmPassword")}
+        value={confirm}
+        onChange={handleChangeConfirm}
         error={errors.confirmPassword}
         placeholder="Confirm your password"
       />
 
-      <Button type="submit" loading={loading}>
+      <Button type="submit" loading={isLoading}>
         Sign Up
       </Button>
     </form>

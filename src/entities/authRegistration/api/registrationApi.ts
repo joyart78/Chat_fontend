@@ -1,15 +1,24 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { RegistrationFormFields } from "../model/types.ts";
+import { baseApi } from "@/app/api/baseApi";
+import type { RegistrationData } from "@/entities/authRegistration";
 
-const initialState: Omit<RegistrationFormFields, "confirmPassword"> = {
-  username: "",
-  password: "",
-};
+export interface RegistrationResponse {
+  id: number;
+  login: string;
+  created_at: string;
+  updated_at: string;
+}
 
-const registrationApi = createSlice({
-  name: "registration",
-  initialState,
-    reducers:
+export const registrationApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    registration: builder.mutation<RegistrationResponse, RegistrationData>({
+      query: (body) => ({
+        url: "/auth/register",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["User"],
+    }),
+  }),
 });
 
-export default registrationApi.reducer;
+export const { useRegistrationMutation } = registrationApi;

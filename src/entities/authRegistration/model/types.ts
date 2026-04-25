@@ -1,17 +1,22 @@
 export interface RegistrationData {
-  username: string;
+  login: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string;
 }
 
 export interface RegistrationFormFields {
-  username: string;
+  login: string;
   password: string;
   confirmPassword: string;
 }
 
 export interface RegistrationErrors {
-  username?: string;
+  login?: string;
   password?: string;
   confirmPassword?: string;
+}
+
+export interface RegistrationResponse {
+  login: string;
+  password: string;
 }
