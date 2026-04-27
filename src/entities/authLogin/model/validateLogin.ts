@@ -3,8 +3,8 @@ import type { LoginData, LoginErrors } from "./types/types.ts";
 export const validateLogin = (data: LoginData): LoginErrors => {
   const errors: LoginErrors = {};
 
-  if (!data.username.trim()) {
-    errors.username = "Username is required";
+  if (!data.login.trim()) {
+    errors.login = "Username is required";
   }
 
   if (!data.password) {
