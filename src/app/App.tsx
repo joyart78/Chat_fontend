@@ -1,12 +1,11 @@
 import "./App.css";
-import { RegistrationForm } from "@/features/auth/registration";
-// import { LoginForm } from "@/features/auth/login";
+import { RouterProvider } from "react-router";
+import router from "@/app/router/router.tsx";
 
 function App() {
   return (
     <>
-      {/*<LoginForm />*/}
-      <RegistrationForm />
+      <RouterProvider router={router} />
     </>
   );
 }

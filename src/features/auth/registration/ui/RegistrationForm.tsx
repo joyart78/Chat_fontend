@@ -9,6 +9,7 @@ import {
 } from "@/entities/authRegistration";
 import { useRegistrationMutation } from "@/entities/authRegistration/api/registrationApi";
 import styles from "./RegistrationForm.module.css";
+import { Link } from "react-router";
 
 export const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationData>({
@@ -83,6 +84,8 @@ export const RegistrationForm = () => {
       <Button type="submit" loading={isLoading}>
         Sign Up
       </Button>
+
+      <Link to="/login">Логин</Link>
     </form>
   );
 };

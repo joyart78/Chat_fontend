@@ -1,23 +1,38 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface LoginState {
-  token: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuth: boolean;
 }
 
 const initialState: LoginState = {
-  token: null,
+  accessToken: null,
+  refreshToken: null,
+  isAuth: false,
 };
 
 const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
-    setToken(state, action) {
-      state.token = action.payload;
+    setAccessToken(state, action) {
+      state.accessToken = action.payload;
+    },
+    setRefreshToken(state, action) {
+      state.refreshToken = action.payload;
+    },
+    setTokens(state, action) {
+      state.accessToken = action.payload;
+      state.refreshToken = action.payload;
+    },
+    setIsAuth(state, action) {
+      state.isAuth = action.payload;
     },
   },
 });
 
-export const { setToken } = loginSlice.actions;
+export const { setAccessToken, setRefreshToken, setTokens, setIsAuth } =
+  loginSlice.actions;
 
 export default loginSlice.reducer;
