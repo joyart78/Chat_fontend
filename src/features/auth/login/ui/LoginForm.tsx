@@ -56,7 +56,7 @@ export const LoginForm = () => {
       const decoded: Token = jwtDecode(result.token);
       dispatch(setRefreshToken(decoded.refresh_token));
       dispatch(setIsAuth(true));
-      navigate("chat");
+      navigate("/chat");
       console.log("Login success:", result);
     } catch (error) {
       console.error("Login failed:", error);

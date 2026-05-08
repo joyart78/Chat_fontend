@@ -9,6 +9,7 @@ import {
 } from "@/entities/authRegistration";
 import { useRegistrationMutation } from "@/entities/authRegistration/api/registrationApi";
 import styles from "./RegistrationForm.module.css";
+import { useNavigate } from "react-router";
 
 export const RegistrationForm = () => {
   const [formData, setFormData] = useState<RegistrationData>({
@@ -22,6 +23,7 @@ export const RegistrationForm = () => {
     setConfirm(e.currentTarget.value);
   };
 
+  const navigate = useNavigate();
   const handleChange =
     (field: keyof RegistrationData) => (e: FormEvent<HTMLInputElement>) => {
       const value = e.currentTarget.value;
@@ -43,6 +45,7 @@ export const RegistrationForm = () => {
     try {
       console.log("registration", formData);
       const result = await registration(formData).unwrap();
+      navigate("/login");
       console.log("Registration success:", result);
     } catch (error) {
       console.error("Registration failed:", error);
