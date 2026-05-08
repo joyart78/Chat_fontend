@@ -7,11 +7,13 @@ import {
 } from "react-redux";
 import { baseApi } from "@/app/api/baseApi";
 import loginReducer from "@/entities/authLogin/model/slice/loginSlice.tsx";
+import chatReducer from "@/entities/chat/model/slice/chatSlice.ts";
 
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
     token: loginReducer,
+    chat: chatReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

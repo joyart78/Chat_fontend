@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Input, Button } from "@/shared/ui";
+import { Input, Button, Ref } from "@/shared/ui";
 import {
   type LoginData,
   type LoginErrors,
@@ -17,13 +17,15 @@ import {
 } from "@/entities/authLogin/model/slice/loginSlice.tsx";
 import { jwtDecode } from "jwt-decode";
 import type { Token } from "@/entities/authLogin";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 
 export const LoginForm = () => {
   const [formData, setFormData] = useState<LoginData>({
     login: "",
     password: "",
   });
+
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState<LoginErrors>({});
   const [login, { isLoading }] = useLoginMutation();
@@ -54,6 +56,7 @@ export const LoginForm = () => {
       const decoded: Token = jwtDecode(result.token);
       dispatch(setRefreshToken(decoded.refresh_token));
       dispatch(setIsAuth(true));
+      navigate("chat");
       console.log("Login success:", result);
     } catch (error) {
       console.error("Login failed:", error);
@@ -86,9 +89,9 @@ export const LoginForm = () => {
         Sign In
       </Button>
 
-      <Link to="/registration">
+      <Ref link="/registration">
         Ещё не зарегистрированы? Зарегистрироваться!
-      </Link>
+      </Ref>
     </form>
   );
 };
