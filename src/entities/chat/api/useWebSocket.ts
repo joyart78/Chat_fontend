@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import { addMessage, setConnectionStatus } from "../model/slice/chatSlice";
 import type { Message } from "../model/types/types.ts";
@@ -16,7 +17,7 @@ export function useWebSocket({
 }: UseWebSocketOptions) {
   const dispatch = useAppDispatch();
   const accessToken = useAppSelector((state) => state.token.accessToken);
-  const wsRef = useRef<WebSocket | null>(null);
+  const socketRef = useRef<Socket | null>(null);
   const retryCountRef = useRef(0);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryFnRef = useRef<() => void>(() => {});
@@ -31,66 +32,66 @@ export function useWebSocket({
   const connect = useCallback(() => {
     clearRetryTimeout();
 
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
     }
-
-    const wsUrl = accessToken ? `${url}?token=${accessToken}` : url;
 
     dispatch(setConnectionStatus("connecting"));
 
-    try {
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
+    const socket = io(url, {
+      auth: {
+        token: accessToken,
+      },
+      transports: ["websocket"],
+      reconnection: false,
+    });
 
-      ws.onopen = () => {
-        dispatch(setConnectionStatus("connected"));
-        retryCountRef.current = 0;
-      };
+    socketRef.current = socket;
 
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data) as {
-            id: string;
-            content: string;
-            sender: "user" | "other";
-            timestamp?: number;
-          };
+    socket.on("connect", () => {
+      dispatch(setConnectionStatus("connected"));
+      retryCountRef.current = 0;
+    });
 
-          const message: Message = {
-            id: data.id || crypto.randomUUID(),
-            content: data.content,
-            sender: data.sender,
-            timestamp: data.timestamp || Date.now(),
-          };
+    socket.on("message", (data: unknown) => {
+      try {
+        const parsed = data as {
+          id: string;
+          content: string;
+          sender: "user" | "other";
+          timestamp?: number;
+        };
 
-          dispatch(addMessage(message));
-        } catch {
-          console.error("Failed to parse WebSocket message");
-        }
-      };
+        const message: Message = {
+          id: parsed.id || crypto.randomUUID(),
+          content: parsed.content,
+          sender: parsed.sender,
+          timestamp: parsed.timestamp || Date.now(),
+        };
 
-      ws.onerror = () => {
-        dispatch(setConnectionStatus("error"));
-      };
+        dispatch(addMessage(message));
+      } catch {
+        console.error("Failed to parse WebSocket message");
+      }
+    });
 
-      ws.onclose = () => {
-        dispatch(setConnectionStatus("disconnected"));
-        wsRef.current = null;
-
-        if (retryCountRef.current < maxRetries) {
-          const delay = baseDelay * Math.pow(2, retryCountRef.current);
-          retryCountRef.current += 1;
-
-          retryTimeoutRef.current = setTimeout(() => {
-            retryFnRef.current();
-          }, delay);
-        }
-      };
-    } catch {
+    socket.on("connect_error", () => {
       dispatch(setConnectionStatus("error"));
-    }
+    });
+
+    socket.on("disconnect", () => {
+      dispatch(setConnectionStatus("disconnected"));
+
+      if (retryCountRef.current < maxRetries) {
+        const delay = baseDelay * Math.pow(2, retryCountRef.current);
+        retryCountRef.current += 1;
+
+        retryTimeoutRef.current = setTimeout(() => {
+          retryFnRef.current();
+        }, delay);
+      }
+    });
   }, [url, accessToken, dispatch, baseDelay, maxRetries, clearRetryTimeout]);
 
   useEffect(() => {
@@ -103,16 +104,16 @@ export function useWebSocket({
 
     return () => {
       clearRetryTimeout();
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
       }
     };
   }, [connect, clearRetryTimeout]);
 
   const sendMessage = useCallback((content: string) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ content }));
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("message", { content });
       return true;
     }
     return false;
