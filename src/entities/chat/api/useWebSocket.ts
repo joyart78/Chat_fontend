@@ -36,9 +36,7 @@ export function useWebSocket({
       wsRef.current = null;
     }
 
-    const wsUrl = accessToken
-      ? `${url.replace("http", "ws")}?token=${accessToken}`
-      : url.replace("http", "ws");
+    const wsUrl = accessToken ? `${url}?token=${accessToken}` : url;
 
     dispatch(setConnectionStatus("connecting"));
 
