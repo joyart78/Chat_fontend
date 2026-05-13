@@ -4,7 +4,7 @@ import { MessageInput } from "../MessageInput";
 import { MessageList } from "../MessageList";
 import styles from "./ChatWindow.module.css";
 
-const WS_URL = "ws://77.91.94.81:8000/chat/ws";
+const WS_URL = "http://77.91.94.81:8000/chat/ws";
 
 export function ChatWindow() {
   const connectionStatus = useAppSelector(
@@ -17,9 +17,7 @@ export function ChatWindow() {
       <header className={styles.header}>
         <h1 className={styles.title}>Chat</h1>
         <div className={styles.status}>
-          <span
-            className={`${styles.statusDot} ${styles[connectionStatus]}`}
-          />
+          <span className={`${styles.statusDot} ${styles[connectionStatus]}`} />
           {connectionStatus}
         </div>
       </header>
