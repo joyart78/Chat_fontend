@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/store";
-import { addMessage, setConnectionStatus } from "../model/slice/chatSlice";
-import type { Message } from "../model/types/types.ts";
+import { addMessage, setConnectionStatus } from "@/entities/chat";
+import type { Message } from "@/entities/chat";
 
 interface UseWebSocketOptions {
   url: string;
@@ -36,7 +36,9 @@ export function useWebSocket({
       wsRef.current = null;
     }
 
-    const wsUrl = accessToken ? `${url}?token=${accessToken}` : url;
+    const wsUrl = accessToken
+      ? `${url.replace("http", "wss")}?token=${accessToken}`
+      : url.replace("http", "wss");
 
     dispatch(setConnectionStatus("connecting"));
 

@@ -4,7 +4,7 @@ import { MessageInput } from "../MessageInput";
 import { MessageList } from "../MessageList";
 import styles from "./ChatWindow.module.css";
 
-const WS_URL = "http://77.91.94.81:8000/chat/ws";
+const WS_URL = "wss://77.91.94.81:8000/chat/ws";
 
 export function ChatWindow() {
   const connectionStatus = useAppSelector(
